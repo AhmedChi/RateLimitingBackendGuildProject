@@ -22,6 +22,8 @@ namespace RateLimitingBackendGuildProject.ApiService.Middleware
 
             var buckets = bucketStore.Buckets.GetOrAdd(apiKey, value);
 
+            var shouldproceed = true;
+
             lock (buckets)
             {
                 var currentTime = DateTime.UtcNow;
@@ -32,19 +34,28 @@ namespace RateLimitingBackendGuildProject.ApiService.Middleware
 
                 buckets.Tokens = Math.Min(buckets.Capacity, buckets.Tokens + (int)totalTokensGeneratedPerSecond);
                 buckets.LastRefillTime = currentTime;
-                
-                buckets.Tokens = Math.Max(0, buckets.Tokens-1);
-                
+
+                if (buckets.Tokens > 0)
+                {
+                    shouldproceed = true;
+                    buckets.Tokens = Math.Max(0, buckets.Tokens - 1);
+                }
+                else
+                {
+                    shouldproceed = false;
+                }
             }
 
-            if (buckets.Tokens == 0)
+            if (shouldproceed)
+            {
+                await next(context);
+            }
+            else
             {
                 context.Response.StatusCode = StatusCodes.Status429TooManyRequests;
                 await context.Response.WriteAsync("Too Many Requests: Rate limit exceeded.");
                 return;
             }
-
-            await next(context);
         }
     }
 }
