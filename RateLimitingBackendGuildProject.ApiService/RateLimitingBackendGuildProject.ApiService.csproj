@@ -7,12 +7,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\RateLimitingBackendGuildProject.ServiceDefaults\RateLimitingBackendGuildProject.ServiceDefaults.csproj"/>
+        <ProjectReference Include="..\RateLimitingBackendGuildProject.ServiceDefaults\RateLimitingBackendGuildProject.ServiceDefaults.csproj" />
     </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Aspire.StackExchange.Redis" Version="13.2.2" />
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0"/>
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0" />
     </ItemGroup>
 
 </Project>
