@@ -10,6 +10,8 @@ builder.Services.AddProblemDetails();
 builder.Services.AddSingleton<ClientStore>();
 builder.Services.AddOpenApi();
 
+builder.Services.AddSingleton<TokenBucketStore>();
+
 var app = builder.Build();
 
 app.UseExceptionHandler();
@@ -21,8 +23,6 @@ if (app.Environment.IsDevelopment())
 
 app.UseMiddleware<ApiKeyMiddleware>();
 app.UseMiddleware<RateLimitMiddleware>();
-
-builder.Services.AddSingleton<TokenBucketStore>();
 
 app.MapWeatherEndpoints();
 app.MapDefaultEndpoints();

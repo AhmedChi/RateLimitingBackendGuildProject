@@ -26,14 +26,25 @@ namespace RateLimitingBackendGuildProject.ApiService.Middleware
             {
                 var currentTime = DateTime.UtcNow;
 
-                var elapsedTime = currentTime - value.LastRefillTime;
+                var elapsedTime = currentTime - buckets.LastRefillTime;
 
-                var totalTokensGeneratedPerSecond = elapsedTime.TotalSeconds * value.RefillRatePerSecond;
+                var totalTokensGeneratedPerSecond = elapsedTime.TotalSeconds * buckets.RefillRatePerSecond;
 
-                value.Tokens = Math.Min(value.Capacity, value.Tokens + (int)totalTokensGeneratedPerSecond);
-                value.LastRefillTime = currentTime;
+                buckets.Tokens = Math.Min(buckets.Capacity, buckets.Tokens + (int)totalTokensGeneratedPerSecond);
+                buckets.LastRefillTime = currentTime;
+                
+                buckets.Tokens = Math.Max(0, buckets.Tokens-1);
+                
             }
 
+            if (buckets.Tokens == 0)
+            {
+                context.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+                await context.Response.WriteAsync("Too Many Requests: Rate limit exceeded.");
+                return;
+            }
+
+            await next(context);
         }
     }
 }
